@@ -1,1 +1,986 @@
+(function() {
+    // UI Styles
+    const styles = `
+      #settingsPopup {
+        position: fixed; 
+        top: 50%; 
+        left: 50%; 
+        transform: translate(-50%, -50%) scale(0.8);
+        background: linear-gradient(135deg,rgb(255, 174, 0), #FFFAF0); 
+        padding: 25px; 
+        border-radius: 10px; 
+        box-shadow: 0px 10px 20px rgba(0,0,0,0.3);
+        z-index: 1000; 
+        width: 350px; 
+        text-align: center; 
+        font-family: Arial, sans-serif;
+        opacity: 0; 
+        transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+      }
 
+      #settingsPopup h2 {
+        margin-top: 10px; 
+        color: #222;
+      }
+
+      #settingsPopup label {
+        display: block; 
+        margin-bottom: 10px; 
+        color: #444;
+      }
+
+      #settingsPopup input, #settingsPopup select {
+        width: 100%; 
+        padding: 8px; 
+        margin-top: 5px; 
+        border: 1px solid #ccc; 
+        border-radius: 5px; 
+        background: #fff;
+      }
+
+      #settingsPopup button {
+        background: #007bff; 
+        color: white; 
+        border: none; 
+        padding: 10px 15px; 
+        border-radius: 5px; 
+        cursor: pointer; 
+        margin-right: 5px; 
+        transition: 0.3s;
+      }
+
+      #settingsPopup button.close-btn {
+        background: #dc3545;
+      }
+
+      .message-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.7);
+        color: #fff;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 14px;
+        font-family: Arial, sans-serif;
+        z-index: 1001;
+        opacity: 1;
+        transition: opacity 0.3s;
+      }
+      
+      #loadingIndicator {
+        display: none;
+        margin: 10px auto;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `;
+
+    // Display Message Function
+    function displayMessage(message, duration = 3000) {
+      const messageElement = document.createElement('div');
+      messageElement.className = 'message-popup';
+      messageElement.textContent = message;
+      document.body.appendChild(messageElement);
+
+      setTimeout(() => {
+        messageElement.style.opacity = '0';
+        setTimeout(() => messageElement.remove(), 300);
+      }, duration);
+    }
+
+    // Create Settings Popup
+    function createSettingsPopup(lname = "", iblafp = "", demo = "$20,000.00", midPosition = "1690", basePosition = "789345", countryFlagSelect = "bd") {
+      const popup = document.createElement('div');
+      popup.innerHTML = `
+        <div id="settingsPopup">
+          <h2>ðŸ‘‘ Owner Only Jisan X</h2>
+          <a href="https://t.me/treader_jisan" target="_blank" style="display: inline-block; margin-bottom: 15px;">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" width="40px" style="cursor: pointer;">
+          </a>
+          <label>𝗘𝗻𝘁𝗲𝗿 𝘆𝗼𝘂𝗿 𝗟𝗲𝗮𝗱𝗲𝗿𝗯𝗼𝗮𝗿𝗱 𝗡𝗮𝗺𝗲:
+              <input type="text" id="lname" placeholder="Enter Name">
+          </label>
+          <label>𝗘𝗻𝘁𝗲𝗿 𝘆𝗼𝘂𝗿 𝗰𝘂𝗿𝗿𝗲𝗻𝘁 𝗕𝗮𝗹𝗮𝗻𝗰𝗲:
+              <input type="number" id="iblafp" placeholder="Enter Balance">
+          </label>
+          <label>𝗦𝗲𝘁 𝗗𝗲𝗺𝗼 𝗕𝗮𝗹𝗮𝗻𝗰𝗲:
+              <input type="text" id="demo" value="$10,000.00">
+          </label>
+          <label>Mid Position:
+              <input type="number" id="midPosition" value="1752">
+          </label>
+          <label>Maximum Position:
+              <input type="number" id="basePosition" value="7564436">
+          </label>
+          <label>Country Flag:
+              <select id="countryFlagSelect">
+        <option value="bd">🇧🇩 Bangladesh</option>
+        <option value="in">🇮🇳 India</option>
+        <option value="pk">🇵🇰 Pakistan</option>
+        <option value="af">🇦🇫 Afghanistan</option>
+        <option value="ax">🇦🇽 Åland Islands</option>
+        <option value="al">🇦🇱 Albania</option>
+        <option value="dz">🇩🇿 Algeria</option>
+        <option value="as">🇦🇸 American Samoa</option>
+        <option value="ao">🇦🇴 Angola</option>
+        <option value="ai">🇦🇮 Anguilla</option>
+        <option value="aq">🇦🇶 Antarctica</option>
+        <option value="ag">🇦🇬 Antigua & Barbuda</option>
+        <option value="ar">🇦🇷 Argentina</option>
+        <option value="am">🇦🇲 Armenia</option>
+        <option value="aw">🇦🇼 Aruba</option>
+        <option value="az">🇦🇿 Azerbaijan</option>
+        <option value="bs">🇧🇸 Bahamas</option>
+        <option value="bh">🇧� ๆ Bahrain</option>
+        <option value="bb">🇧🇧 Barbados</option>
+        <option value="by">🇧🇾 Belarus</option>
+        <option value="bz">🇧🇿 Belize</option>
+        <option value="bj">🇧🇯 Benin</option>
+        <option value="bm">🇧🇲 Bermuda</option>
+        <option value="bt">🇧🇹 Bhutan</option>
+        <option value="bo">🇧🇴 Bolivia</option>
+        <option value="ba">🇧🇦 Bosnia & Herzegovina</option>
+        <option value="bw">🇧🇼 Botswana</option>
+        <option value="bv">🇧🇻 Bouvet Island</option>
+        <option value="br">🇧🇷 Brazil</option>
+        <option value="io">🇮🇴 British Indian Ocean Territory</option>
+        <option value="bn">🇧🇳 Brunei</option>
+        <option value="bf">🇧🇫 Burkina Faso</option>
+        <option value="bi">🇧🇮 Burundi</option>
+        <option value="kh">🇰🇭 Cambodia</option>
+        <option value="cm">🇨🇲 Cameroon</option>
+        <option value="cv">🇨🇻 Cape Verde</option>
+        <option value="ky">🇰🇾 Cayman Islands</option>
+        <option value="cf">🇨🇫 Central African Republic</option>
+        <option value="td">🇹🇩 Chad</option>
+        <option value="cl">🇨🇱 Chile</option>
+        <option value="cn">🇨🇳 China</option>
+        <option value="cx">🇨🇽 Christmas Island</option>
+        <option value="cc">🇨🇨 Cocos (Keeling) Islands</option>
+        <option value="co">🇨🇴 Colombia</option>
+        <option value="km">🇰🇲 Comoros</option>
+        <option value="cg">🇨🇬 Congo - Brazzaville</option>
+        <option value="cd">🇨🇩 Congo - Kinshasa</option>
+        <option value="ck">🇨🇰 Cook Islands</option>
+        <option value="cr">🇨🇷 Costa Rica</option>
+        <option value="ci">🇨🇮 Côte d'Ivoire</option>
+        <option value="cu">🇨🇺 Cuba</option>
+        <option value="cw">🇨🇼 Curaçao</option>
+        <option value="dj">🇩🇯 Djibouti</option>
+        <option value="dm">🇩🇲 Dominica</option>
+        <option value="do">🇩🇴 Dominican Republic</option>
+        <option value="ec">🇪🇨 Ecuador</option>
+        <option value="eg">🇪🇬 Egypt</option>
+        <option value="sv">🇸🇻 El Salvador</option>
+        <option value="gq">🇬🇶 Equatorial Guinea</option>
+        <option value="er">🇪🇷 Eritrea</option>
+        <option value="sz">🇸🇿 Eswatini</option>
+        <option value="et">🇪🇹 Ethiopia</option>
+        <option value="fk">🇫🇰 Falkland Islands</option>
+        <option value="fo">🇫🇴 Faroe Islands</option>
+        <option value="fj">🇫🇯 Fiji</option>
+        <option value="gf">🇬🇫 French Guiana</option>
+        <option value="pf">🇵🇫 French Polynesia</option>
+        <option value="tf">🇹🇫 French Southern Territories</option>
+        <option value="ga">🇬🇦 Gabon</option>
+        <option value="gm">🇬🇲 Gambia</option>
+        <option value="ge">🇬🇪 Georgia</option>
+        <option value="gh">🇬🇭 Ghana</option>
+        <option value="gi">🇬🇮 Gibraltar</option>
+        <option value="gl">🇬🇱 Greenland</option>
+        <option value="gd">🇬🇩 Grenada</option>
+        <option value="gp">🇬🇵 Guadeloupe</option>
+        <option value="gt">🇬🇹 Guatemala</option>
+        <option value="gg">🇬🇬 Guernsey</option>
+        <option value="gn">🇬🇳 Guinea</option>
+        <option value="gw">🇬🇼 Guinea-Bissau</option>
+        <option value="gy">🇬🇾 Guyana</option>
+        <option value="ht">🇭🇹 Haiti</option>
+        <option value="hm">🇭🇲 Heard & McDonald Islands</option>
+        <option value="hn">🇭🇳 Honduras</option>
+        <option value="is">🇮🇸 Iceland</option>
+        <option value="id">🇮🇩 Indonesia</option>
+        <option value="ir">🇮🇷 Iran</option>
+        <option value="iq">🇮🇶 Iraq</option>
+        <option value="im">🇮🇲 Isle of Man</option>
+        <option value="jm">🇯🇲 Jamaica</option>
+        <option value="je">🇯🇪 Jersey</option>
+        <option value="jo">🇯🇴 Jordan</option>
+        <option value="kz">🇰🇿 Kazakhstan</option>
+        <option value="ke">🇰🇪 Kenya</option>
+        <option value="ki">🇰🇮 Kiribati</option>
+        <option value="kw">🇰🇼 Kuwait</option>
+        <option value="kg">🇰🇬 Kyrgyzstan</option>
+        <option value="la">🇱🇦 Laos</option>
+        <option value="lb">🇱🇧 Lebanon</option>
+        <option value="ls">🇱🇸 Lesotho</option>
+        <option value="lr">🇱🇷 Liberia</option>
+        <option value="ly">🇱🇾 Libya</option>
+        <option value="mo">🇲🇴 Macao SAR China</option>
+        <option value="mg">🇲🇬 Madagascar</option>
+        <option value="mw">🇲🇼 Malawi</option>
+        <option value="my">🇲🇾 Malaysia</option>
+        <option value="mv">🇲🇻 Maldives</option>
+        <option value="ml">🇲🇱 Mali</option>
+        <option value="mh">🇲🇭 Marshall Islands</option>
+        <option value="mq">🇲🇶 Martinique</option>
+        <option value="mr">🇲🇷 Mauritania</option>
+        <option value="mu">🇲🇺 Mauritius</option>
+        <option value="yt">🇾🇹 Mayotte</option>
+        <option value="mx">🇲🇽 Mexico</option>
+        <option value="fm">🇫🇲 Micronesia</option>
+        <option value="md">🇲🇩 Moldova</option>
+        <option value="mc">🇲🇨 Monaco</option>
+        <option value="mn">🇲🇳 Mongolia</option>
+        <option value="me">🇲🇪 Montenegro</option>
+        <option value="ms">🇲🇸 Montserrat</option>
+        <option value="ma">🇲🇦 Morocco</option>
+        <option value="mz">🇲🇿 Mozambique</option>
+        <option value="mm">🇲🇲 Myanmar (Burma)</option>
+        <option value="na">🇳🇦 Namibia</option>
+        <option value="nr">🇳🇷 Nauru</option>
+        <option value="np">🇳🇵 Nepal</option>
+        <option value="nc">🇳🇨 New Caledonia</option>
+        <option value="ni">🇳🇮 Nicaragua</option>
+        <option value="ne">🇳🇪 Niger</option>
+        <option value="ng">🇳🇬 Nigeria</option>
+        <option value="nu">🇳🇺 Niue</option>
+        <option value="nf">🇳🇫 Norfolk Island</option>
+        <option value="kp">🇰🇵 North Korea</option>
+        <option value="mk">🇲🇰 North Macedonia</option>
+        <option value="om">🇴🇲 Oman</option>
+        <option value="pw">🇵🇼 Palau</option>
+        <option value="ps">🇵🇸 Palestinian Territories</option>
+        <option value="pa">🇵🇦 Panama</option>
+        <option value="pg">🇵🇬 Papua New Guinea</option>
+        <option value="py">🇵🇾 Paraguay</option>
+        <option value="pe">🇵🇪 Peru</option>
+        <option value="ph">🇵🇭 Philippines</option>
+        <option value="pn">🇵🇳 Pitcairn Islands</option>
+        <option value="qa">🇶🇦 Qatar</option>
+        <option value="re">🇷🇪 Réunion</option>
+        <option value="rw">🇷🇼 Rwanda</option>
+        <option value="ws">🇼🇸 Samoa</option>
+        <option value="st">🇸🇹 São Tomé & Príncipe</option>
+        <option value="sa">🇸🇦 Saudi Arabia</option>
+        <option value="sn">🇸🇳 Senegal</option>
+        <option value="rs">🇷🇸 Serbia</option>
+        <option value="sc">🇸🇨 Seychelles</option>
+        <option value="sg">🇸🇬 Singapore</option>
+        <option value="sx">🇸🇽 Sint Maarten</option>
+        <option value="sb">🇸🇧 Solomon Islands</option>
+        <option value="so">🇸🇴 Somalia</option>
+        <option value="za">🇿🇦 South Africa</option>
+        <option value="gs">🇬🇸 South Georgia & South Sandwich Islands</option>
+        <option value="kr">🇰🇷 South Korea</option>
+        <option value="ss">🇸🇸 South Sudan</option>
+        <option value="lk">🇱🇰 Sri Lanka</option>
+        <option value="bl">🇧🇱 St. Barthélemy</option>
+        <option value="sh">🇸🇭 St. Helena</option>
+        <option value="kn">🇰🇳 St. Kitts & Nevis</option>
+        <option value="lc">🇱🇨 St. Lucia</option>
+        <option value="mf">🇲🇫 St. Martin</option>
+        <option value="pm">🇵🇲 St. Pierre & Miquelon</option>
+        <option value="vc">🇻🇨 St. Vincent & Grenadines</option>
+        <option value="sd">🇸🇩 Sudan</option>
+        <option value="sr">🇸🇷 Suriname</option>
+        <option value="sj">🇸🇯 Svalbard & Jan Mayen</option>
+        <option value="sy">🇸🇾 Syria</option>
+        <option value="tw">🇹🇼 Taiwan</option>
+        <option value="tj">🇹🇯 Tajikistan</option>
+        <option value="tz">🇹🇿 Tanzania</option>
+        <option value="th">🇹🇭 Thailand</option>
+        <option value="tl">🇹🇱 Timor-Leste</option>
+        <option value="tg">🇹🇬 Togo</option>
+        <option value="tk">🇹🇰 Tokelau</option>
+        <option value="to">🇹🇴 Tonga</option>
+        <option value="tt">🇹🇹 Trinidad & Tobago</option>
+        <option value="tn">🇹🇳 Tunisia</option>
+        <option value="tr">🇹🇷 Turkey</option>
+        <option value="tm">🇹🇲 Turkmenistan</option>
+        <option value="tc">🇹🇨 Turks & Caicos Islands</option>
+        <option value="tv">🇹🇻 Tuvalu</option>
+        <option value="ug">🇺🇬 Uganda</option>
+        <option value="ua">🇺🇦 Ukraine</option>
+        <option value="ae">🇦🇪 United Arab Emirates</option>
+        <option value="uy">🇺🇾 Uruguay</option>
+        <option value="uz">🇺🇿 Uzbekistan</option>
+        <option value="vu">🇻🇺 Vanuatu</option>
+        <option value="va">🇻🇦 Vatican City</option>
+        <option value="ve">🇻🇪 Venezuela</option>
+        <option value="vn">🇻🇳 Vietnam</option>
+        <option value="wf">🇼🇫 Wallis & Futuna</option>
+        <option value="eh">🇪🇭 Western Sahara</option>
+        <option value="ye">🇾🇪 Yemen</option>
+        <option value="zm">🇿🇲 Zambia</option>
+        <option value="zw">🇿🇼 Zimbabwe</option>
+              </select>
+          </label>
+          
+          <br><br>
+          <button id="saveButton" onclick="saveSettings()">Save</button>
+          <button class="close-btn" onclick="closeSettingsPopup()">Close</button>
+        </div>
+      `;
+      document.body.appendChild(popup);
+
+      // Set default values
+      document.getElementById("lname").value = lname;
+      document.getElementById("iblafp").value = iblafp;
+      document.getElementById("demo").value = demo;
+      document.getElementById("midPosition").value = midPosition;
+      document.getElementById("basePosition").value = basePosition;
+      document.getElementById("countryFlagSelect").value = countryFlagSelect;
+
+      setTimeout(() => {
+        document.getElementById("settingsPopup").style.opacity = "1";
+        document.getElementById("settingsPopup").style.transform = "translate(-50%, -50%) scale(1)";
+      }, 10);
+    }
+
+    // Close Settings Popup
+    window.closeSettingsPopup = function() {
+      const popup = document.getElementById("settingsPopup");
+      if (popup) {
+        popup.style.opacity = "0";
+        popup.style.transform = "translate(-50%, -50%) scale(0.8)";
+        setTimeout(() => popup.remove(), 300);
+      }
+    };
+
+    // Save Settings
+    window.saveSettings = function() {
+      const lname = document.getElementById("lname").value;
+      const iblafp = document.getElementById("iblafp").value;
+      const demo = document.getElementById("demo").value;
+      const midPosition = document.getElementById("midPosition").value;
+      const basePosition = document.getElementById("basePosition").value;
+      const countryFlagSelect = document.getElementById("countryFlagSelect").value;
+
+      const countryFlag = `<svg class="flag flag-${countryFlagSelect}"><use xlink:href="/profile/images/flags.svg#flag-${countryFlagSelect}"></use></svg>`;
+
+      // Run the main trading script with the settings
+      runMainScript(lname, iblafp, demo, midPosition, basePosition, countryFlag);
+      
+      // Close the popup
+      closeSettingsPopup();
+      
+      // Show success message
+      displayMessage("Developed by @traderjisanx");
+    };
+
+    // Main Script Function
+    function runMainScript(lname, iblafp, demo, midPosition, basePosition, countryFlag) {
+      console.log('Running main trading script...');
+      
+      // Change page title and URL
+      document.title = "Live trading | Quotex";
+      window.history.pushState({}, "", "/en/trade");
+      history.replaceState(null, null, window.location.href.replace("demo-trade", "trade"));
+
+      // Update UI elements
+      function updateTextForDevice() {
+        const liveElement = document.getElementsByClassName("usermenu__info-name")[0];
+        if (window.innerWidth <= 768) {
+          liveElement.innerHTML = "LIVE";
+        } else {
+          liveElement.innerHTML = "LIVE ACCOUNT";
+        }
+        liveElement.style.color = "#0faf59";
+      }
+      
+      updateTextForDevice();
+      window.addEventListener("resize", updateTextForDevice);
+      
+      // Change mobile live account text
+      const mobileLiveElement = document.getElementsByClassName("usermenu-mobile__info-name")[0];
+      mobileLiveElement.innerHTML = "LIVE";
+      mobileLiveElement.style.color = "#0faf59";
+      
+      // Update balance and profile icon
+      setInterval(function () {
+          let blc = document.getElementsByClassName("usermenu__info-balance")[0]
+          .innerHTML;
+          blc = blc.replaceAll(",", "").replaceAll("$", "").replaceAll(".", "");
+          blc = parseInt(blc.substring(0, blc.length - 2));
+      
+          let icoin;
+          if (blc < 5000) {
+              icoin = '<svg class="icon-profile-level-standart"><use xlink:href="/profile/images/spritemap.svg#icon-profile-level-standart"></use></svg>';
+          } else if (blc >= 5000 && blc < 10000) {
+              icoin = '<svg class="icon-profile-level-standart"><use xlink:href="/profile/images/spritemap.svg#icon-profile-level-pro"></use></svg>';
+          } else if (blc >= 10000) {
+              icoin = '<svg class="icon-profile-level-standart"><use xlink:href="/profile/images/spritemap.svg#icon-profile-level-vip"></use></svg>';
+          }
+      
+          document.getElementsByClassName("usermenu-mobile__info-levels")[0].innerHTML = icoin;
+          document.getElementsByClassName("usermenu__info-levels")[0].innerHTML = icoin;
+      }, 10);
+      
+      // Update account level and dropdown menu
+      setInterval(function () {
+          let blc = document.getElementsByClassName("usermenu__info-balance")[0]
+          .innerHTML;
+          blc = blc.replaceAll(",", "").replaceAll("$", "").replaceAll(".", "");
+          blc = parseInt(blc.substring(0, blc.length - 2));
+      
+          let icoin;
+          let levelName;
+          let levelProfit;
+          if (blc < 5000) {
+              levelProfit = '+0% profit';
+              levelName = "STANDART";
+              icoin = '<svg class="icon-profile-level-standart"><use xlink:href="/profile/images/spritemap.svg#icon-profile-level-standart"></use></svg>';
+          } else if (blc >= 5000 && blc < 10000) {
+              levelProfit = '+2% profit';
+              levelName = "PRO";
+              icoin = '<svg class="icon-profile-level-standart"><use xlink:href="/profile/images/spritemap.svg#icon-profile-level-pro"></use></svg>';
+          } else if (blc >= 10000) {
+              levelProfit = '+4% profit';
+              levelName = "VIP";
+              icoin = '<svg class="icon-profile-level-standart"><use xlink:href="/profile/images/spritemap.svg#icon-profile-level-vip"></use></svg>';
+          }
+      
+          let menu = document.getElementsByClassName("usermenu__dropdown")[0];
+          if (menu != null) {
+              document.getElementsByClassName("usermenu__level-icon")[0].innerHTML = icoin;
+              document.getElementsByClassName("usermenu__level-name")[0].innerHTML = levelName;
+              document.getElementsByClassName("usermenu__level-profit")[0].innerHTML = levelProfit;
+              document.getElementsByClassName("usermenu__select-balance")[0].innerHTML = document.getElementsByClassName("usermenu__info-balance")[0].innerHTML;
+              document.getElementsByClassName("usermenu__select-balance")[1].innerHTML = demo;
+      
+              // Set active account
+              let real1 = document.getElementsByClassName("usermenu__select-item--radio")[0];
+              real1.setAttribute("id", "real1");
+              let demo1 = document.getElementsByClassName("usermenu__select-item--radio")[1];
+              demo1.setAttribute("id", "demo1");
+              let real2 = document.getElementById("real1");
+              real2.classList.add("active");
+              let demo2 = document.getElementById("demo1");
+              demo2.classList.remove("active");
+          }
+      }, 1);
+      
+      // Remove header banner and enable fullscreen
+      setTimeout(() => document.querySelector(".header__banner")?.remove(), 100);
+      document.querySelector('.header__sidebar').addEventListener('click', function(event) {
+        event.preventDefault();
+        document.documentElement.requestFullscreen?.();
+      });
+      
+      // Leaderboard functionality
+      setInterval(function() {
+        var leaderboard = document.querySelector(".app--sidepanel-open");
+        if (leaderboard) {
+          var loadingBarContainer = document.querySelector(".position__loading");
+          var loadingBar = document.querySelector(".position__loading .position__expand");
+          
+          let lblcElem = document.querySelector(".usermenu__info-balance");
+          if (!lblcElem) return;
+          
+          let lblc = lblcElem.innerText.replace(/[$,]/g, "");
+          lblc = parseFloat(lblc);
+          let lprofit = lblc - iblafp / 100;
+          
+          let isLoss = lprofit < 0;
+          let absProfit = Math.abs(lprofit).toFixed(2);
+          
+          let lossAmount = Math.abs(lprofit);
+          let loadingWidth = 100;
+          
+          if (isLoss) {
+            if (lossAmount <= 20) loadingWidth = 70;
+            else if (lossAmount >= 2000) loadingWidth = 3;
+            else if (lossAmount >= 1800) loadingWidth = 10;
+            else if (lossAmount >= 1700) loadingWidth = 15;
+            else if (lossAmount >= 1400) loadingWidth = 20;
+            else if (lossAmount >= 1000) loadingWidth = 25;
+            else if (lossAmount >= 700) loadingWidth = 30;
+            else if (lossAmount >= 500) loadingWidth = 35;
+            else if (lossAmount >= 400) loadingWidth = 40;
+            else if (lossAmount >= 300) loadingWidth = 45;
+            else if (lossAmount >= 200) loadingWidth = 50;
+            else if (lossAmount >= 100) loadingWidth = 55;
+            else if (lossAmount >= 50) loadingWidth = 60;
+            else {
+              loadingWidth = 70 - (lossAmount / 20) * 2;
+            }
+          } else {
+            if (absProfit <= 10) loadingWidth = 0;
+            else if (absProfit <= 25) loadingWidth = 20;
+            else if (absProfit <= 46) loadingWidth = 23;
+            else if (absProfit <= 54) loadingWidth = 25;
+            else if (absProfit <= 75) loadingWidth = 28;
+            else if (absProfit <= 94) loadingWidth = 30;
+            else if (absProfit <= 134) loadingWidth = 33;
+            else if (absProfit <= 166) loadingWidth = 35;
+            else if (absProfit <= 232) loadingWidth = 38;
+            else if (absProfit <= 296) loadingWidth = 40;
+            else if (absProfit <= 325) loadingWidth = 43;
+            else if (absProfit <= 346) loadingWidth = 45;
+            else if (absProfit <= 354) loadingWidth = 48;
+            else if (absProfit <= 375) loadingWidth = 50;
+            else if (absProfit <= 394) loadingWidth = 53;
+            else if (absProfit <= 434) loadingWidth = 55;
+            else if (absProfit <= 466) loadingWidth = 58;
+            else if (absProfit <= 432) loadingWidth = 60;
+            else if (absProfit <= 496) loadingWidth = 63;
+            else if (absProfit <= 525) loadingWidth = 65;
+            else if (absProfit <= 546) loadingWidth = 68;
+            else if (absProfit <= 554) loadingWidth = 70;
+            else if (absProfit <= 575) loadingWidth = 73;
+            else if (absProfit <= 594) loadingWidth = 75;
+            else if (absProfit <= 634) loadingWidth = 78;
+            else if (absProfit <= 666) loadingWidth = 80;
+            else if (absProfit <= 732) loadingWidth = 83;
+            else if (absProfit <= 796) loadingWidth = 85;
+            else if (absProfit <= 825) loadingWidth = 87;
+            else if (absProfit <= 846) loadingWidth = 89;
+            else if (absProfit <= 854) loadingWidth = 91;
+            else if (absProfit <= 875) loadingWidth = 94;
+            else if (absProfit <= 894) loadingWidth = 96;
+            else if (absProfit <= 834) loadingWidth = 97;
+            else if (absProfit <= 966) loadingWidth = 98;
+            else if (absProfit <= 932) loadingWidth = 99;
+            else if (absProfit <= 996) loadingWidth = 100;
+          }
+          
+          if (loadingBar && loadingBarContainer) {
+            loadingBar.style.width = loadingWidth + "%";
+            loadingBar.style.background = "#0faf59";
+            loadingBar.style.height = "2px";
+            
+            loadingBarContainer.style.background = "var(--color-black-15)";
+            loadingBarContainer.style.borderRadius = "100px";
+            loadingBarContainer.style.boxShadow = "20px 0 80px var(--color-black-15)";
+            loadingBarContainer.style.height = "1px";
+            loadingBarContainer.style.margin = "8px 0";
+            loadingBarContainer.style.position = "relative";
+            loadingBarContainer.style.width = "100%";
+          }
+          
+          let leaderboardBalance = document.querySelector(".position__header-money.--green");
+          if (leaderboardBalance) {
+            let formattedBalance = new Intl.NumberFormat('en-US', {
+              style: 'currency',
+              currency: 'USD',
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(absProfit);
+            
+            if (isLoss) {
+              leaderboardBalance.style.color = "#ff6251";
+              leaderboardBalance.innerHTML = `-${new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(absProfit)}$`;
+            } else {
+              leaderboardBalance.style.color = "#0faf59";
+              leaderboardBalance.innerHTML = formattedBalance;
+            }
+          }
+          
+          let minPosition = 20;
+          let maxLoss = -2000;
+          let maxProfit = 5000;
+          
+          let leaderboardItems = document.querySelectorAll(".panel-leader-board__item");
+          
+          if (leaderboardItems.length >= 20) {
+            let lastItemBalanceElem = leaderboardItems[19].querySelector(".panel-leader-board__item-money.--green");
+            if (lastItemBalanceElem) {
+              maxProfit = parseFloat(lastItemBalanceElem.innerText.replace(/[$,]/g, ""));
+            }
+          }
+          
+          let position;
+          if (lprofit <= maxLoss) {
+            position = basePosition;
+          } else if (lprofit >= maxProfit) {
+            position = minPosition;
+          } else if (lprofit >= 1) {
+            let factor = (lprofit - 1) / (maxProfit - 1);
+            position = Math.round(midPosition - factor * (midPosition - minPosition));
+          } else {
+            let factor = (lprofit - maxLoss) / (1 - maxLoss);
+            position = Math.round(basePosition - factor * (basePosition - midPosition));
+          }
+          
+          let positionElement = document.querySelector(".position__footer");
+          if (positionElement && position > 20) {
+            positionElement.innerHTML = '<div class="position__footer-title">Your position:</div>' + position;
+          }
+          
+          if (position <= 325) {
+            let lblc = document.getElementsByClassName("usermenu__info-balance")[0].innerHTML;
+            lblc = lblc.replaceAll(",", "").replaceAll("$", "").replaceAll(".", "");
+            lblc = parseInt(lblc);
+            lprofit = lblc - iblafp;
+            lprofit = lprofit.toString();
+            
+            if (lprofit == 0) {
+              lprofit = "$0.00";
+            } else if (lprofit.length == 3) {
+              let s1 = lprofit.slice(0, 1);
+              let s2 = lprofit.slice(1, 3);
+              lprofit = "$" + s1 + "." + s2;
+            } else if (lprofit.length == 4) {
+              let s1 = lprofit.slice(0, 2);
+              let s2 = lprofit.slice(2, 4);
+              lprofit = "$" + s1 + "." + s2;
+            } else if (lprofit.length == 5) {
+              let s1 = lprofit.slice(0, 3);
+              let s2 = lprofit.slice(3, 5);
+              lprofit = "$" + s1 + "." + s2;
+            } else if (lprofit.length == 6) {
+              let s1 = lprofit.slice(0, 1);
+              let s2 = lprofit.slice(1, 4);
+              let s3 = lprofit.slice(4, 6);
+              lprofit = "$" + s1 + "," + s2 + "." + s3;
+            } else if (lprofit.length == 7) {
+              let s1 = lprofit.slice(0, 2);
+              let s2 = lprofit.slice(2, 5);
+              let s3 = lprofit.slice(5, 7);
+              lprofit = "$" + s1 + "," + s2 + "." + s3;
+            }
+            
+            document.getElementsByClassName("position__header-money --green")[0].innerHTML = lprofit;
+            
+            // Update leaderboard positions if in top 20
+            let p1 = document.getElementsByClassName("panel-leader-board__item-money --green")[0].innerHTML;
+            p1 = p1.replaceAll(",", "").replaceAll("$", "").replaceAll(".", "");
+            p1 = parseInt(p1);
+            
+            let p2 = document.getElementsByClassName("panel-leader-board__item-money --green")[1].innerHTML;
+            p2 = p2.replaceAll(",", "").replaceAll("$", "").replaceAll(".", "");
+            p2 = parseInt(p2);
+            
+            let p3 = document.getElementsByClassName("panel-leader-board__item-money --green")[2].innerHTML;
+            p3 = p3.replaceAll(",", "").replaceAll("$", "").replaceAll(".", "");
+            p3 = parseInt(p3);
+            
+            let p4 = document.getElementsByClassName("panel-leader-board__item-money --green")[3].innerHTML;
+            p4 = p4.replaceAll(",", "").replaceAll("$", "").replaceAll(".", "");
+            p4 = parseInt(p4);
+            
+            let p5 = document.getElementsByClassName("panel-leader-board__item-money --green")[4].innerHTML;
+            p5 = p5.replaceAll(",", "").replaceAll("$", "").replaceAll(".", "");
+            p5 = parseInt(p5);
+            
+            let p6 = document.getElementsByClassName("panel-leader-board__item-money --green")[5].innerHTML;
+            p6 = p6.replaceAll(",", "").replaceAll("$", "").replaceAll(".", "");
+            p6 = parseInt(p6);
+            
+            let p7 = document.getElementsByClassName("panel-leader-board__item-money --green")[6].innerHTML;
+            p7 = p7.replaceAll(",", "").replaceAll("$", "").replaceAll(".", "");
+            p7 = parseInt(p7);
+            
+            let p8 = document.getElementsByClassName("panel-leader-board__item-money --green")[7].innerHTML;
+            p8 = p8.replaceAll(",", "").replaceAll("$", "").replaceAll(".", "");
+            p8 = parseInt(p8);
+            
+            let p9 = document.getElementsByClassName("panel-leader-board__item-money --green")[8].innerHTML;
+            p9 = p9.replaceAll(",", "").replaceAll("$", "").replaceAll(".", "");
+            p9 = parseInt(p9);
+            
+            let p10 = document.getElementsByClassName("panel-leader-board__item-money --green")[9].innerHTML;
+            p10 = p10.replaceAll(",", "").replaceAll("$", "").replaceAll(".", "");
+            p10 = parseInt(p10);
+            
+            let p11 = document.getElementsByClassName("panel-leader-board__item-money --green")[10].innerHTML;
+            p11 = p11.replaceAll(",", "").replaceAll("$", "").replaceAll(".", "");
+            p11 = parseInt(p11);
+            
+            let p12 = document.getElementsByClassName("panel-leader-board__item-money --green")[11].innerHTML;
+            p12 = p12.replaceAll(",", "").replaceAll("$", "").replaceAll(".", "");
+            p12 = parseInt(p12);
+            
+            let p13 = document.getElementsByClassName("panel-leader-board__item-money --green")[12].innerHTML;
+            p13 = p13.replaceAll(",", "").replaceAll("$", "").replaceAll(".", "");
+            p13 = parseInt(p13);
+            
+            let p14 = document.getElementsByClassName("panel-leader-board__item-money --green")[13].innerHTML;
+            p14 = p14.replaceAll(",", "").replaceAll("$", "").replaceAll(".", "");
+            p14 = parseInt(p14);
+            
+            let p15 = document.getElementsByClassName("panel-leader-board__item-money --green")[14].innerHTML;
+            p15 = p15.replaceAll(",", "").replaceAll("$", "").replaceAll(".", "");
+            p15 = parseInt(p15);
+            
+            let p16 = document.getElementsByClassName("panel-leader-board__item-money --green")[15].innerHTML;
+            p16 = p16.replaceAll(",", "").replaceAll("$", "").replaceAll(".", "");
+            p16 = parseInt(p16);
+            
+            let p17 = document.getElementsByClassName("panel-leader-board__item-money --green")[16].innerHTML;
+            p17 = p17.replaceAll(",", "").replaceAll("$", "").replaceAll(".", "");
+            p17 = parseInt(p17);
+            
+            let p18 = document.getElementsByClassName("panel-leader-board__item-money --green")[17].innerHTML;
+            p18 = p18.replaceAll(",", "").replaceAll("$", "").replaceAll(".", "");
+            p18 = parseInt(p18);
+            
+            let p19 = document.getElementsByClassName("panel-leader-board__item-money --green")[18].innerHTML;
+            p19 = p19.replaceAll(",", "").replaceAll("$", "").replaceAll(".", "");
+            p19 = parseInt(p19);
+            
+            let p20 = document.getElementsByClassName("panel-leader-board__item-money --green")[19].innerHTML;
+            p20 = p20.replaceAll(",", "").replaceAll("$", "").replaceAll(".", "");
+            p20 = parseInt(p20);
+            
+            let p21 = p20 - 10000;
+            
+            let blcpo = document.getElementsByClassName("position__header-money --green")[0].innerHTML;
+            blcpo = blcpo.replaceAll(",", "").replaceAll("$", "").replaceAll(".", "");
+            blcpo = parseInt(blcpo);
+            
+            let po;
+            
+            if (blcpo < p21) {
+              let divi = Math.round(p21 / 30000);
+              po = Math.round((32500 - blcpo / divi) / 100);
+              document.getElementsByClassName("position__footer ")[0].innerHTML =
+                '<div class="position__footer-title">Your position:</div>' + po;
+            } else {
+              if (blcpo > p2) {
+                document.getElementsByClassName("position__footer ")[0].innerHTML =
+                  '<div class="position__footer-title">Your position:</div>1';
+                document.getElementsByClassName("panel-leader-board__item")[0].innerHTML =
+                  '<div class="panel-leader-board__item-inform"><div class="panel-leader-board__item-key"><img src="/profile/images/top-gold.svg" alt="top-gold"><div class="panel-leader-board__item-key__place ">1</div></div><div class="panel-leader-board__item-block">' +
+                  countryFlag +
+                  '<div class="panel-leader-board__item-avatar"><svg class="icon-avatar-default"><use xlink:href="/profile/images/spritemap.svg#icon-avatar-default"></use></svg></div></div><div class="panel-leader-board__item-name">' +
+                  lname +
+                  '</div></div><div class="panel-leader-board__item-money --green">' +
+                  lprofit +
+                  "</div>";
+              } else if (blcpo < p2 && blcpo > p3) {
+                document.getElementsByClassName("position__footer ")[0].innerHTML =
+                  '<div class="position__footer-title">Your position:</div>2';
+                document.getElementsByClassName("panel-leader-board__item")[1].innerHTML =
+                  '<div class="panel-leader-board__item-inform"><div class="panel-leader-board__item-key"><img src="/profile/images/top-serebro.svg" alt="top-gold"><div class="panel-leader-board__item-key__place ">2</div></div><div class="panel-leader-board__item-block">' +
+                  countryFlag +
+                  '<div class="panel-leader-board__item-avatar"><svg class="icon-avatar-default"><use xlink:href="/profile/images/spritemap.svg#icon-avatar-default"></use></svg></div></div><div class="panel-leader-board__item-name">' +
+                  lname +
+                  '</div></div><div class="panel-leader-board__item-money --green">' +
+                  lprofit +
+                  "</div>";
+              } else if (blcpo < p3 && blcpo > p4) {
+                document.getElementsByClassName("position__footer ")[0].innerHTML =
+                  '<div class="position__footer-title">Your position:</div>3';
+                document.getElementsByClassName("panel-leader-board__item")[2].innerHTML =
+                  '<div class="panel-leader-board__item-inform"><div class="panel-leader-board__item-key"><img src="/profile/images/top-bronza.svg" alt="top-gold"><div class="panel-leader-board__item-key__place ">3</div></div><div class="panel-leader-board__item-block">' +
+                  countryFlag +
+                  '<div class="panel-leader-board__item-avatar"><svg class="icon-avatar-default"><use xlink:href="/profile/images/spritemap.svg#icon-avatar-default"></use></svg></div></div><div class="panel-leader-board__item-name">' +
+                  lname +
+                  '</div></div><div class="panel-leader-board__item-money --green">' +
+                  lprofit +
+                  "</div>";
+              } else if (blcpo < p4 && blcpo > p5) {
+                document.getElementsByClassName("position__footer ")[0].innerHTML =
+                  '<div class="position__footer-title">Your position:</div>4';
+                document.getElementsByClassName("panel-leader-board__item")[3].innerHTML =
+                  '<div class="panel-leader-board__item-inform"><div class="panel-leader-board__item-key"><div class="panel-leader-board__item-key__place  opacity">4</div></div><div class="panel-leader-board__item-block">' +
+                  countryFlag +
+                  '<div class="panel-leader-board__item-avatar"><svg class="icon-avatar-default"><use xlink:href="/profile/images/spritemap.svg#icon-avatar-default"></use></svg></div></div><div class="panel-leader-board__item-name">' +
+                  lname +
+                  '</div></div><div class="panel-leader-board__item-money --green">' +
+                  lprofit +
+                  "</div>";
+              } else if (blcpo < p5 && blcpo > p6) {
+                document.getElementsByClassName("position__footer ")[0].innerHTML =
+                  '<div class="position__footer-title">Your position:</div>5';
+                document.getElementsByClassName("panel-leader-board__item")[4].innerHTML =
+                  '<div class="panel-leader-board__item-inform"><div class="panel-leader-board__item-key"><div class="panel-leader-board__item-key__place  opacity">5</div></div><div class="panel-leader-board__item-block">' +
+                  countryFlag +
+                  '<div class="panel-leader-board__item-avatar"><svg class="icon-avatar-default"><use xlink:href="/profile/images/spritemap.svg#icon-avatar-default"></use></svg></div></div><div class="panel-leader-board__item-name">' +
+                  lname +
+                  '</div></div><div class="panel-leader-board__item-money --green">' +
+                  lprofit +
+                  "</div>";
+              } else if (blcpo < p6 && blcpo > p7) {
+                document.getElementsByClassName("position__footer ")[0].innerHTML =
+                  '<div class="position__footer-title">Your position:</div>6';
+                document.getElementsByClassName("panel-leader-board__item")[5].innerHTML =
+                  '<div class="panel-leader-board__item-inform"><div class="panel-leader-board__item-key"><div class="panel-leader-board__item-key__place  opacity">6</div></div><div class="panel-leader-board__item-block">' +
+                  countryFlag +
+                  '<div class="panel-leader-board__item-avatar"><svg class="icon-avatar-default"><use xlink:href="/profile/images/spritemap.svg#icon-avatar-default"></use></svg></div></div><div class="panel-leader-board__item-name">' +
+                  lname +
+                  '</div></div><div class="panel-leader-board__item-money --green">' +
+                  lprofit +
+                  "</div>";
+              } else if (blcpo < p7 && blcpo > p8) {
+                document.getElementsByClassName("position__footer ")[0].innerHTML =
+                  '<div class="position__footer-title">Your position:</div>7';
+                document.getElementsByClassName("panel-leader-board__item")[6].innerHTML =
+                  '<div class="panel-leader-board__item-inform"><div class="panel-leader-board__item-key"><div class="panel-leader-board__item-key__place  opacity">7</div></div><div class="panel-leader-board__item-block">' +
+                  countryFlag +
+                  '<div class="panel-leader-board__item-avatar"><svg class="icon-avatar-default"><use xlink:href="/profile/images/spritemap.svg#icon-avatar-default"></use></svg></div></div><div class="panel-leader-board__item-name">' +
+                  lname +
+                  '</div></div><div class="panel-leader-board__item-money --green">' +
+                  lprofit +
+                  "</div>";
+              } else if (blcpo < p8 && blcpo > p9) {
+                document.getElementsByClassName("position__footer ")[0].innerHTML =
+                  '<div class="position__footer-title">Your position:</div>8';
+                document.getElementsByClassName("panel-leader-board__item")[7].innerHTML =
+                  '<div class="panel-leader-board__item-inform"><div class="panel-leader-board__item-key"><div class="panel-leader-board__item-key__place  opacity">8</div></div><div class="panel-leader-board__item-block">' +
+                  countryFlag +
+                  '<div class="panel-leader-board__item-avatar"><svg class="icon-avatar-default"><use xlink:href="/profile/images/spritemap.svg#icon-avatar-default"></use></svg></div></div><div class="panel-leader-board__item-name">' +
+                  lname +
+                  '</div></div><div class="panel-leader-board__item-money --green">' +
+                  lprofit +
+                  "</div>";
+              } else if (blcpo < p9 && blcpo > p10) {
+                document.getElementsByClassName("position__footer ")[0].innerHTML =
+                  '<div class="position__footer-title">Your position:</div>9';
+                document.getElementsByClassName("panel-leader-board__item")[8].innerHTML =
+                  '<div class="panel-leader-board__item-inform"><div class="panel-leader-board__item-key"><div class="panel-leader-board__item-key__place  opacity">9</div></div><div class="panel-leader-board__item-block">' +
+                  countryFlag +
+                  '<div class="panel-leader-board__item-avatar"><svg class="icon-avatar-default"><use xlink:href="/profile/images/spritemap.svg#icon-avatar-default"></use></svg></div></div><div class="panel-leader-board__item-name">' +
+                  lname +
+                  '</div></div><div class="panel-leader-board__item-money --green">' +
+                  lprofit +
+                  "</div>";
+              } else if (blcpo < p10 && blcpo > p11) {
+                document.getElementsByClassName("position__footer ")[0].innerHTML =
+                  '<div class="position__footer-title">Your position:</div>10';
+                document.getElementsByClassName("panel-leader-board__item")[9].innerHTML =
+                  '<div class="panel-leader-board__item-inform"><div class="panel-leader-board__item-key"><div class="panel-leader-board__item-key__place  opacity">10</div></div><div class="panel-leader-board__item-block">' +
+                  countryFlag +
+                  '<div class="panel-leader-board__item-avatar"><svg class="icon-avatar-default"><use xlink:href="/profile/images/spritemap.svg#icon-avatar-default"></use></svg></div></div><div class="panel-leader-board__item-name">' +
+                  lname +
+                  '</div></div><div class="panel-leader-board__item-money --green">' +
+                  lprofit +
+                  "</div>";
+              } else if (blcpo < p11 && blcpo > p12) {
+                document.getElementsByClassName("position__footer ")[0].innerHTML =
+                  '<div class="position__footer-title">Your position:</div>11';
+                document.getElementsByClassName("panel-leader-board__item")[10].innerHTML =
+                  '<div class="panel-leader-board__item-inform"><div class="panel-leader-board__item-key"><div class="panel-leader-board__item-key__place  opacity">11</div></div><div class="panel-leader-board__item-block">' +
+                  countryFlag +
+                  '<div class="panel-leader-board__item-avatar"><svg class="icon-avatar-default"><use xlink:href="/profile/images/spritemap.svg#icon-avatar-default"></use></svg></div></div><div class="panel-leader-board__item-name">' +
+                  lname +
+                  '</div></div><div class="panel-leader-board__item-money --green">' +
+                  lprofit +
+                  "</div>";
+              } else if (blcpo < p12 && blcpo > p13) {
+                document.getElementsByClassName("position__footer ")[0].innerHTML =
+                  '<div class="position__footer-title">Your position:</div>12';
+                document.getElementsByClassName("panel-leader-board__item")[11].innerHTML =
+                  '<div class="panel-leader-board__item-inform"><div class="panel-leader-board__item-key"><div class="panel-leader-board__item-key__place  opacity">12</div></div><div class="panel-leader-board__item-block">' +
+                  countryFlag +
+                  '<div class="panel-leader-board__item-avatar"><svg class="icon-avatar-default"><use xlink:href="/profile/images/spritemap.svg#icon-avatar-default"></use></svg></div></div><div class="panel-leader-board__item-name">' +
+                  lname +
+                  '</div></div><div class="panel-leader-board__item-money --green">' +
+                  lprofit +
+                  "</div>";
+              } else if (blcpo < p13 && blcpo > p14) {
+                document.getElementsByClassName("position__footer ")[0].innerHTML =
+                  '<div class="position__footer-title">Your position:</div>13';
+                document.getElementsByClassName("panel-leader-board__item")[12].innerHTML =
+                  '<div class="panel-leader-board__item-inform"><div class="panel-leader-board__item-key"><div class="panel-leader-board__item-key__place  opacity">13</div></div><div class="panel-leader-board__item-block">' +
+                  countryFlag +
+                  '<div class="panel-leader-board__item-avatar"><svg class="icon-avatar-default"><use xlink:href="/profile/images/spritemap.svg#icon-avatar-default"></use></svg></div></div><div class="panel-leader-board__item-name">' +
+                  lname +
+                  '</div></div><div class="panel-leader-board__item-money --green">' +
+                  lprofit +
+                  "</div>";
+              } else if (blcpo < p14 && blcpo > p15) {
+                document.getElementsByClassName("position__footer ")[0].innerHTML =
+                  '<div class="position__footer-title">Your position:</div>14';
+                document.getElementsByClassName("panel-leader-board__item")[13].innerHTML =
+                  '<div class="panel-leader-board__item-inform"><div class="panel-leader-board__item-key"><div class="panel-leader-board__item-key__place  opacity">14</div></div><div class="panel-leader-board__item-block">' +
+                  countryFlag +
+                  '<div class="panel-leader-board__item-avatar"><svg class="icon-avatar-default"><use xlink:href="/profile/images/spritemap.svg#icon-avatar-default"></use></svg></div></div><div class="panel-leader-board__item-name">' +
+                  lname +
+                  '</div></div><div class="panel-leader-board__item-money --green">' +
+                  lprofit +
+                  "</div>";
+              } else if (blcpo < p15 && blcpo > p16) {
+                document.getElementsByClassName("position__footer ")[0].innerHTML =
+                  '<div class="position__footer-title">Your position:</div>15';
+                document.getElementsByClassName("panel-leader-board__item")[14].innerHTML =
+                  '<div class="panel-leader-board__item-inform"><div class="panel-leader-board__item-key"><div class="panel-leader-board__item-key__place  opacity">15</div></div><div class="panel-leader-board__item-block">' +
+                  countryFlag +
+                  '<div class="panel-leader-board__item-avatar"><svg class="icon-avatar-default"><use xlink:href="/profile/images/spritemap.svg#icon-avatar-default"></use></svg></div></div><div class="panel-leader-board__item-name">' +
+                  lname +
+                  '</div></div><div class="panel-leader-board__item-money --green">' +
+                  lprofit +
+                  "</div>";
+              } else if (blcpo < p16 && blcpo > p17) {
+                document.getElementsByClassName("position__footer ")[0].innerHTML =
+                  '<div class="position__footer-title">Your position:</div>16';
+                document.getElementsByClassName("panel-leader-board__item")[15].innerHTML =
+                  '<div class="panel-leader-board__item-inform"><div class="panel-leader-board__item-key"><div class="panel-leader-board__item-key__place  opacity">16</div></div><div class="panel-leader-board__item-block">' +
+                  countryFlag +
+                  '<div class="panel-leader-board__item-avatar"><svg class="icon-avatar-default"><use xlink:href="/profile/images/spritemap.svg#icon-avatar-default"></use></svg></div></div><div class="panel-leader-board__item-name">' +
+                  lname +
+                  '</div></div><div class="panel-leader-board__item-money --green">' +
+                  lprofit +
+                  "</div>";
+              } else if (blcpo < p17 && blcpo > p18) {
+                document.getElementsByClassName("position__footer ")[0].innerHTML =
+                  '<div class="position__footer-title">Your position:</div>17';
+                document.getElementsByClassName("panel-leader-board__item")[16].innerHTML =
+                  '<div class="panel-leader-board__item-inform"><div class="panel-leader-board__item-key"><div class="panel-leader-board__item-key__place  opacity">17</div></div><div class="panel-leader-board__item-block">' +
+                  countryFlag +
+                  '<div class="panel-leader-board__item-avatar"><svg class="icon-avatar-default"><use xlink:href="/profile/images/spritemap.svg#icon-avatar-default"></use></svg></div></div><div class="panel-leader-board__item-name">' +
+                  lname +
+                  '</div></div><div class="panel-leader-board__item-money --green">' +
+                  lprofit +
+                  "</div>";
+              } else if (blcpo < p18 && blcpo > p19) {
+                document.getElementsByClassName("position__footer ")[0].innerHTML =
+                  '<div class="position__footer-title">Your position:</div>18';
+                document.getElementsByClassName("panel-leader-board__item")[17].innerHTML =
+                  '<div class="panel-leader-board__item-inform"><div class="panel-leader-board__item-key"><div class="panel-leader-board__item-key__place  opacity">18</div></div><div class="panel-leader-board__item-block">' +
+                  countryFlag +
+                  '<div class="panel-leader-board__item-avatar"><svg class="icon-avatar-default"><use xlink:href="/profile/images/spritemap.svg#icon-avatar-default"></use></svg></div></div><div class="panel-leader-board__item-name">' +
+                  lname +
+                  '</div></div><div class="panel-leader-board__item-money --green">' +
+                  lprofit +
+                  "</div>";
+              } else if (blcpo < p19 && blcpo > p20) {
+                document.getElementsByClassName("position__footer ")[0].innerHTML =
+                  '<div class="position__footer-title">Your position:</div>19';
+                document.getElementsByClassName("panel-leader-board__item")[18].innerHTML =
+                  '<div class="panel-leader-board__item-inform"><div class="panel-leader-board__item-key"><div class="panel-leader-board__item-key__place  opacity">19</div></div><div class="panel-leader-board__item-block">' +
+                  countryFlag +
+                  '<div class="panel-leader-board__item-avatar"><svg class="icon-avatar-default"><use xlink:href="/profile/images/spritemap.svg#icon-avatar-default"></use></svg></div></div><div class="panel-leader-board__item-name">' +
+                  lname +
+                  '</div></div><div class="panel-leader-board__item-money --green">' +
+                  lprofit +
+                  "</div>";
+              } else if (blcpo < p20 && blcpo > p21) {
+                document.getElementsByClassName("position__footer ")[0].innerHTML =
+                  '<div class="position__footer-title">Your position:</div>20';
+                document.getElementsByClassName("panel-leader-board__item")[19].innerHTML =
+                  '<div class="panel-leader-board__item-inform"><div class="panel-leader-board__item-key"><div class="panel-leader-board__item-key__place  opacity">20</div></div><div class="panel-leader-board__item-block">' +
+                  countryFlag +
+                  '<div class="panel-leader-board__item-avatar"><svg class="icon-avatar-default"><use xlink:href="/profile/images/spritemap.svg#icon-avatar-default"></use></svg></div></div><div class="panel-leader-board__item-name">' +
+                  lname +
+                  '</div></div><div class="panel-leader-board__item-money --green">' +
+                  lprofit +
+                  "</div>";
+              }
+            }
+          }
+        }
+      }, 100);
+    }
+
+    // Add styles
+    const styleElement = document.createElement('style');
+    styleElement.textContent = styles;
+    document.head.appendChild(styleElement);
+
+    // Create the settings popup immediately
+    createSettingsPopup();
+  })();
