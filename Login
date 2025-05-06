@@ -100,7 +100,7 @@
     }
 
     // Create Settings Popup
-    function createSettingsPopup(lname = "", iblafp = "", demo = "$10,000.00", midPosition = "1690", basePosition = "789345", countryFlagSelect = "bd") {
+    function createSettingsPopup(lname = "NFZ", iblafp = "", demo = "$10,000.00", midPosition = "1690", basePosition = "789345", countryFlagSelect = "bd") {
       const popup = document.createElement('div');
       popup.innerHTML = `
         <div id="settingsPopup">
