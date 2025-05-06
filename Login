@@ -1,5 +1,5 @@
 (function() {
-    // UI Styles
+    // UI Styles (vershon 1)
     const styles = `
         #settingsPopup {
           position: fixed; 
