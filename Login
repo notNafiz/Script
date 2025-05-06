@@ -1,5 +1,5 @@
 (function() {
-    // UI Styles (NFZ)
+    // UI Styles (vershon 2)
     const styles = `
         #settingsPopup {
           position: fixed; 
@@ -372,8 +372,6 @@
       // Close the popup
       closeSettingsPopup();
       
-      // Show success message
-      displayMessage("Developed by @traderjisanx");
     };
 
     // Main Script Function
