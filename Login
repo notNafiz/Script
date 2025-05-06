@@ -1,5 +1,5 @@
 (function() {
-    // UI Styles (vershon 1)
+    // UI Styles (vershon 2)
     const styles = `
         #settingsPopup {
           position: fixed; 
@@ -113,13 +113,13 @@
           <label>𝗦𝗲𝘁 𝘆𝗼𝘂𝗿 𝗗𝗲𝗺𝗼 𝗕𝗮𝗹𝗮𝗻𝗰𝗲:
               <input type="text" id="demo" value="$10,000.00">
           </label>
-          <label>Mid Position:
+          <label>𝗦𝗲𝘁 𝗠𝗶𝗱𝗱𝗹𝗲 𝗣𝗼𝘀𝗶𝘁𝗶𝗼𝗻:
               <input type="number" id="midPosition" value="1798">
           </label>
-          <label>Maximum Position:
+          <label>𝗦𝗲𝘁 𝗠𝗮𝘅𝗶𝗺𝘂𝗺 𝗣𝗼𝘀𝗶𝘁𝗶𝗼𝗻:
               <input type="number" id="basePosition" value="799542">
           </label>
-          <label>Country Flag:
+          <label>𝗦𝗲𝘁 𝗖𝗼𝘂𝗻𝘁𝗿𝘆 𝗙𝗹𝗮𝗴:
               <select id="countryFlagSelect">
                   <option value="bd">   🛑 𝗧𝗵𝗲 𝗙𝗹𝗮𝗴 𝗼𝗳 ➔ 𝗕𝗮𝗻𝗴𝗹𝗮𝗱𝗲𝘀𝗵 🛑</option>
                   <option value="in">   🛑 𝗧𝗵𝗲 𝗙𝗹𝗮𝗴 𝗼𝗳 ➔ 𝗜𝗻𝗱𝗶𝗮 🛑</option>
