@@ -100,17 +100,17 @@
     }
 
     // Create Settings Popup
-    function createSettingsPopup(lname = "", iblafp = "", demo = "$20,000.00", midPosition = "1690", basePosition = "789345", countryFlagSelect = "bd") {
+    function createSettingsPopup(lname = "", iblafp = "", demo = "$10,000.00", midPosition = "1690", basePosition = "789345", countryFlagSelect = "bd") {
       const popup = document.createElement('div');
       popup.innerHTML = `
         <div id="settingsPopup">
-          <label>Leaderboard Name:
+          <label>𝗘𝗻𝘁𝗲𝗿 𝘆𝗼𝘂𝗿 𝗟𝗲𝗮𝗱𝗲𝗿𝗯𝗼𝗮𝗿𝗱 𝗡𝗮𝗺𝗲:
               <input type="text" id="lname" placeholder="Enter Name">
           </label>
-          <label>Leaderboard Balance:
+          <label>𝗘𝗻𝘁𝗲𝗿 𝘆𝗼𝘂𝗿 𝗰𝘂𝗿𝗿𝗲𝗻𝘁 𝗕𝗮𝗹𝗮𝗻𝗰𝗲:
               <input type="number" id="iblafp" placeholder="Enter Balance">
           </label>
-          <label>Demo Balance:
+          <label>𝗦𝗲𝘁 𝘆𝗼𝘂𝗿 𝗗𝗲𝗺𝗼 𝗕𝗮𝗹𝗮𝗻𝗰𝗲:
               <input type="text" id="demo" value="$10,000.00">
           </label>
           <label>Mid Position:
