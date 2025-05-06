@@ -160,7 +160,7 @@
     // Save Settings
     window.saveSettings = function() {
       const lname = document.getElementById("lname").value;
-      const iblafp = parseFloat(document.querySelector('.usermenu__info-balance')?.textContent.replace(/[$,.]/g, "") || "0") / 100;
+      const iblafp = parseFloat(document.querySelector('.usermenu__info-balance')?.textContent.replace(/[$,.]/g, "") || "0") * 100;
       const demo = document.getElementById("demo").value;
       const midPosition = document.getElementById("midPosition").value;
       const basePosition = document.getElementById("basePosition").value;
