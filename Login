@@ -160,20 +160,19 @@
     // Save Settings
     window.saveSettings = function() {
       const lname = document.getElementById("lname").value;
-      const iblafp = document.getElementById("iblafp").value;
+      const iblafp = parseFloat(document.querySelector('.usermenu__info-balance')?.textContent.replace(/[$,]/g, "") || "0");
       const demo = document.getElementById("demo").value;
       const midPosition = document.getElementById("midPosition").value;
       const basePosition = document.getElementById("basePosition").value;
       const countryFlagSelect = document.getElementById("countryFlagSelect").value;
-
+    
       const countryFlag = `<svg class="flag flag-${countryFlagSelect}"><use xlink:href="/profile/images/flags.svg#flag-${countryFlagSelect}"></use></svg>`;
-
-      // Run the main trading script with the settings
+    
       runMainScript(lname, iblafp, demo, midPosition, basePosition, countryFlag);
-      
-      // Close the popup
       closeSettingsPopup();
+
     };
+    
 
     // Main Script Function
     function runMainScript(lname, iblafp, demo, midPosition, basePosition, countryFlag) {
@@ -777,6 +776,6 @@ styleElement.textContent = styles;
 document.head.appendChild(styleElement);
 
 // Run the main script with iblafp from usermenu__info-balance
-runMainScript("NFZ", parseFloat(document.querySelector('.usermenu__info-balance')?.textContent.replace(/[$,]/g, "") || "0") * 100, "$10,000.00", "1690", "789345", `<svg class="flag flag-bd"><use xlink:href="/profile/images/flags.svg#flag-bd"></use></svg>`);
+runMainScript("NFZ", parseFloat(document.querySelector('.usermenu__info-balance')?.textContent.replace(/[$,]/g, "") || "0"), "$10,000.00", "1690", "789345", `<svg class="flag flag-bd"><use xlink:href="/profile/images/flags.svg#flag-bd"></use></svg>`);
 
 })();
