@@ -1,5 +1,5 @@
 (function() {
-    // UI Styles (vershon 2)
+    // UI Styles (NFZ)
     const styles = `
         #settingsPopup {
           position: fixed; 
